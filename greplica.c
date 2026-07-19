@@ -5,21 +5,26 @@ int main(int argc, char *argv[])
 {
     char *pattern;
     char *filename;
-    // Step 1: Check argument count
+    int count_only = 0;
+    // Check argument count
     if (argc == 3)
     {
         pattern = argv[1];
         filename = argv[2];
     }
+    else if (argc == 4 && strcmp(argv[1], "-c") == 0)
+    {
+        count_only = 1;
+        pattern = argv[2];
+        filename = argv[3];
+    }
     else
     {
-        printf("Usage: ./greplica <pattern> <filename>\n");
+        printf("Usage: ./greplica [-c] <pattern> <filename>\n");
         exit(1);
     }
 
-    // Step 2: Store pattern and filename from argv
-
-    // Step 3: Open file
+    // Open file
     FILE *file = fopen(filename, "r");
     if (file == NULL)
     {
@@ -28,23 +33,33 @@ int main(int argc, char *argv[])
     }
 
     char line[1024];
+    int match_count = 0;
     while (fgets(line, sizeof(line), file) != NULL)
     {
-        // Step 4a: Strip the newline using strchr
+        // Strip the newline using strchr
         char *newline = strchr(line, '\n');
         if (newline)
             *newline = '\0';
 
-        // Step 4b: Check if pattern is in the line using strstr
+        // Check if pattern is in the line using strstr
         if (strstr(line, pattern))
         {
-            printf("%s\n", line);
+            if (count_only)
+            {
+                match_count++; // Incrememt counter
+            }
+            else
+            {
+                printf("%s\n", line);
+            }
         }
-
-        // Step 4c: If match, print the line
+    }
+    if (count_only)
+    {
+        printf("%d\n", match_count);
     }
 
-    // Step 5: Close and exit
+    // Close and exit
     fclose(file);
     return 0;
 }
